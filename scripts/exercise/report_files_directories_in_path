@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ -z "$1" ]
+then
+	path=./
+elif [ ! -d $1 ]
+then
+	echo Path $1 Not found
+	exit
+else
+	path=$1
+fi
+files=$(find $path -type f 2>/dev/null | wc -l)
+directories=$(find $path -type d 2>/dev/null | wc -l)
+errors=$(find $path 2>&1 | grep "Permission denied" | wc -l )
+echo in $path Path:
+echo Files count "-->"  $files
+echo Directories count "-->" $directories
+echo Errors count "-->" $errors

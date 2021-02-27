@@ -1,0 +1,54 @@
+#!/bin/bash
+
+read -p "Random number from: " from
+read -p "Random number to: " to
+read -p "Number of chances to choose: " chances
+random_number=$(seq ${from:-1} ${to:-100} | shuf | tail -n 1)
+#function checkGuess {
+#	if [ $1 -eq $2 ]
+#	then
+#		echo Wow....... This number is correct
+#		break
+#	elif [ $1 -gt $2 ]
+#	then
+#		echo You must enter a smaller number
+#	elif [ $1 -lt $2 ]
+#	then
+#		echo You must enter a larger number
+#	fi
+#}
+#for i in $(seq 1 ${chances:-3})
+#do
+#	read -p "Enter Number: " user_number
+#	checkGuess $user_number $random_number
+#	if [ $user_number -eq $random_number ]
+#	then
+#		echo Wow....... This number is correct
+#		break
+#	elif [ $user_number -gt $random_number ]
+#	then
+#		echo You must enter a smaller number
+#	elif [ $user_number -lt $random_number ]
+#	then
+#		echo You must enter a larger number
+#	fi
+#done
+count=0
+while [ $count -lt ${chances:-3} ]
+do
+	read -p "Guess a number: " user_number
+#	checkGuess $user_number $random_number
+	if [ $user_number -eq $random_number ]
+	then
+		echo Hooooray... This number is correct
+		break
+	elif [ $user_number -gt $random_number ]
+	then
+		echo You must enter a smaller number
+	elif [ $user_number -lt $random_number ]
+	then
+		echo You must enter a larger number
+	fi
+	let count++
+done
+echo The number was: $random_number

@@ -1,0 +1,75 @@
+#!/bin/bash
+
+if [ $UID != 0 ] 
+then 
+	echo Permission denied
+	exit
+fi
+
+read -p "User create or delete: " func
+func=${func:-"create"}
+
+if [ $func != "create" ] && [ $func != "delete" ] 
+then
+	echo Please enter carefully!!!
+	exit
+fi
+
+read -p "User prefix: " user_prefix
+
+if [ $func = "create" ]
+then
+	read -p "Password prefix: " password_prefix
+	read -p "Password postfix: " password_postfix
+fi
+
+read -p "User from: " user_from
+read -p "User to: " user_to
+
+function isUserExists {
+	grep -wq $1 /etc/passwd
+}
+
+function deleteUser {
+	isUserExists $1
+	if [ $? -eq 0 ]
+	then
+		userdel -r $1
+		echo User $1 deleted successfully.
+		let success++
+	else
+		echo User $1 Not found!!! >>.userdata.errors
+		let error++
+	fi
+}
+
+function createUser {
+	isUserExists $1
+	if [ $? -eq 0 ]
+	then
+		echo User $1 already exists!!! >>.userdata.errors
+		let error++
+		continue
+	fi
+	password=${2}$RANDOM${3}
+	useradd $1 -p $(openssl passwd -1 $password)
+	let success++
+	echo $(date): Username $1 created.
+	echo $(date):$1:$password >> .userdata
+}
+
+success=0
+error=0
+	
+for number in $(seq ${user_from:-1} ${user_to:-100})
+do
+	username=${user_prefix}${number}
+	if [ $func = "delete" ]
+	then
+		deleteUser $username
+	else
+		createUser $username $password_prefix $password_postfix
+	fi
+done
+echo --------------------------------------------------------------------
+echo Summary: $success User Successfully ${func}d and $error User not ${func}d.

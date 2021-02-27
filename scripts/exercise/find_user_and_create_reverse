@@ -1,0 +1,40 @@
+#!/bin/bash
+
+if [ $(id -u) -ne 0 ]
+then
+	echo Permission denied
+	exit
+fi
+
+function argumanExists {
+	cut -d ":" -f $1 /etc/passwd | grep -wq $2
+}
+
+IFS=":"
+success=0
+error=0
+while read username password uid line
+do
+	new_uid=$(( uid * 2 ))
+	while [ $(argumanExists 3 $new_uid ;echo $?) -eq 0 ]
+	do
+		uid=$(seq 100 999 | shuf | tail -n 1)
+		new_uid=$(( uid * 2 ))
+	done
+	new_username=$(echo $username | rev)
+	while [ $(argumanExists 1 $new_username ;echo $?) -eq 0 ]
+	do
+		new_username=${new_username}${new_uid}
+	done
+	password=$RANDOM
+	echo $(date): Username: $new_username: Password: $password >> .create_reverse_username_data
+	useradd -u $new_uid -p $(openssl passwd -1 $password) $new_username 
+	if [ $? -eq 0 ]
+	then
+		let success++
+	else
+		let error++
+	fi
+done < /etc/passwd
+echo --------------------------------------------------------------------
+echo Summary: $success User Successfully created and $error User not created.

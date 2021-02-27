@@ -1,0 +1,36 @@
+#!/bin/bash
+ip=8.8.8.8
+host=google.com
+route=$(ip route get $ip)
+if [ $? -eq 0 ]
+then
+	echo Gateway: $(ip route get $ip | cut -d " " -f 3)
+else
+	echo Connection: Error
+	exit
+fi
+#packet_loss=$(ping -c 1 $ip | grep "packet loss" | cut -d "," -f 3 | cut -d "%" -f 1)
+#if [ $packet_loss -eq 0 ]
+#then
+#	echo Connection: OK and $ip is Reachable
+#else
+#	echo Connection: Error and $ip is not Reachable
+#fi
+ping=$(ping -c 1 $ip)
+if [ $? -eq 0 ]
+then
+	echo Connection: OK and $ip is Reachable
+else    
+	echo Connection: Error and $ip is not Reachable
+fi
+
+dns_servers=$(grep nameserver /etc/resolv.conf | cut -d " " -f 2)
+echo DNS Servers: $dns_servers
+
+dns_check=$(host -t A -4 -W 1 $host)
+if [ $? -eq 0 ]
+then
+	echo DNS Check: OK and $host Resolved
+else    
+	echo DNS Check: Error and $host is not Resolve
+fi
