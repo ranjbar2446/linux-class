@@ -25,6 +25,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: bash scripts/system/check_connectivity
+      # Runs a multiple command using the runners shell
+      - name: Run a multiple-line script
+        run: bash scripts/system/check_connectivity | bash scripts/system/add_del_many_user
